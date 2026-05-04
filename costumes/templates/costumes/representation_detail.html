@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}{{ rep.titre }} — TheaterWardrobe{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1 class="mb-1">{{ rep.titre }}</h1>
+      <p class="mb-0 opacity-75">
+        {% if rep.lieu %} {{ rep.lieu }} — {% endif %}
+        {{ rep.date_debut|date:"d/m/Y" }} → {{ rep.date_fin|date:"d/m/Y" }}
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <span class="badge bg-{{ rep.statut_badge_class }} fs-6">{{ rep.get_statut_display }}</span>
+      {% if is_admin %}
+      <a href="{% url 'representation_modifier' rep.pk %}" class="btn btn-light btn-sm">Modifier</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if rep.description %}
+<div class="card mb-4">
+  <div class="card-body">{{ rep.description }}</div>
+</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Essayages ({{ essayages.count }})</h4>
+  {% if is_admin %}
+  <a href="{% url 'essayage_ajouter' %}?representation={{ rep.pk }}" class="btn btn-sm" style="background:#6d0d23;color:white">Ajouter essayage</a>
+  {% endif %}
+</div>
+
+{% if essayages %}
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="px-4 py-3">Acteur</th>
+            <th>Costume</th>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Statut</th>
+            <th>Notes</th>
+            {% if is_admin %}<th>Actions</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in essayages %}
+          <tr>
+            <td class="px-4">{{ e.acteur.nom_complet }}</td>
+            <td>{% if e.costume %}{{ e.costume }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td>{{ e.date_essayage|date:"d/m/Y" }}</td>
+            <td>{% if e.heure %}{{ e.heure|time:"H:i" }}{% else %}—{% endif %}</td>
+            <td><span class="badge bg-{{ e.statut_badge_class }}">{{ e.get_statut_display }}</span></td>
+            <td class="text-muted small">{{ e.notes|default:"—"|truncatechars:40 }}</td>
+            {% if is_admin %}
+            <td>
+              <a href="{% url 'essayage_modifier' e.pk %}" class="btn btn-sm btn-outline-secondary btn-sm">Modifier</a>
+              <a href="{% url 'essayage_supprimer' e.pk %}" class="btn btn-sm btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-4">
+  <p class="text-muted">Aucun essayage planifié pour cette représentation.</p>
+  {% if is_admin %}
+  <a href="{% url 'essayage_ajouter' %}?representation={{ rep.pk }}" class="btn" style="background:#6d0d23;color:white">Planifier un essayage</a>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="mt-3">
+  <a href="{% url 'representation_liste' %}" class="btn btn-outline-secondary">Retour aux représentations</a>
+</div>
+{% endblock %}

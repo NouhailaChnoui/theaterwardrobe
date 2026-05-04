@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Administration — TheaterWardrobe{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-1">Tableau de Bord Administration</h1>
+    <p class="mb-0 opacity-75">Gestion complète du système de costumes</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold">{{ total }}</div>
+            <div class="text-muted small">Total costumes</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold text-success">{{ disponibles }}</div>
+            <div class="text-muted small">Disponibles</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold text-danger">{{ empruntes_count }}</div>
+            <div class="text-muted small">Empruntés</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold text-warning">{{ a_reparer }}</div>
+            <div class="text-muted small">À réparer</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold text-info">{{ representations_count }}</div>
+            <div class="text-muted small">Représentations</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card stat-card text-center p-3">
+            <div class="fs-2 fw-bold" style="color:#6d0d23;">{{ essayages_a_venir }}</div>
+            <div class="text-muted small">Essayages à venir</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <a href="{% url 'costume_ajouter' %}" class="card text-decoration-none h-100">
+            <div class="card-body text-center p-3">
+                
+                <p class="mb-0 fw-semibold">Ajouter costume</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'representation_liste' %}" class="card text-decoration-none h-100">
+            <div class="card-body text-center p-3">
+                <p class="mb-0 fw-semibold">Représentations</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'acteur_liste' %}" class="card text-decoration-none h-100">
+            <div class="card-body text-center p-3">
+                <p class="mb-0 fw-semibold">Gérer les acteurs</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'historique' %}" class="card text-decoration-none h-100">
+            <div class="card-body text-center p-3">
+                <p class="mb-0 fw-semibold">Historique</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0">Costumes actuellement empruntés</h5>
+        <span class="badge bg-danger fs-6">{{ empruntes_count }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if empruntes %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3">Costume</th>
+                        <th>Acteur</th>
+                        <th>Date d'emprunt</th>
+                        <th>Durée</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for costume in empruntes %}
+                    <tr>
+                        <td class="px-4"><strong>{{ costume }}</strong></td>
+                        <td>{{ costume.acteur.nom_complet }}</td>
+                        <td>{% if costume.date_emprunt %}{{ costume.date_emprunt|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                        <td class="text-muted small">
+                            {% if costume.date_emprunt %}{{ costume.date_emprunt|timesince }}{% endif %}
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="costume_id" value="{{ costume.pk }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Réinitialiser cet emprunt ?')">
+                                    Réinitialiser
+                                </button>
+                            </form>
+                            <a href="{% url 'costume_retourner' costume.pk %}" class="btn btn-sm btn-outline-success ms-1">
+                                Retour
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <p class="text-muted mt-2">Aucun costume actuellement emprunté. </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

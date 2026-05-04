@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Historique — TheaterWardrobe{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-1">Historique des Emprunts</h1>
+    <p class="mb-0 opacity-75">Suivi complet des mouvements de costumes</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-6 col-md-3">
+                {{ form.date_debut.label_tag }}
+                {{ form.date_debut }}
+            </div>
+            <div class="col-6 col-md-3">
+                {{ form.date_fin.label_tag }}
+                {{ form.date_fin }}
+            </div>
+            <div class="col-6 col-md-2">
+                {{ form.action.label_tag }}
+                {{ form.action }}
+            </div>
+            {% if is_admin %}
+            <div class="col-6 col-md-2">
+                {{ form.acteur.label_tag }}
+                {{ form.acteur }}
+            </div>
+            {% endif %}
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-sm w-100" style="background:#6d0d23;color:white;">
+                     Filtrer
+                </button>
+                <a href="{% url 'historique' %}" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="bi bi-x"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if historiques %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3">Action</th>
+                        <th>Costume</th>
+                        {% if is_admin %}<th>Acteur</th>{% endif %}
+                        <th>Date</th>
+                        <th>Note</th>
+                        {% if is_admin %}<th>Enregistré par</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in historiques %}
+                    <tr>
+                        <td class="px-4">
+                            {% if h.action == 'emprunt' %}
+                            <span class="badge bg-danger"> Emprunt</span>
+                            {% elif h.action == 'retour' %}
+                            <span class="badge bg-success"> Retour</span>
+                            {% else %}
+                            <span class="badge bg-secondary"> Réinit. admin</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ h.costume }}</strong></td>
+                        {% if is_admin %}
+                        <td>
+                            {% if h.acteur %}
+                             {{ h.acteur.nom_complet }}
+                            {% else %}—{% endif %}
+                        </td>
+                        {% endif %}
+                        <td> {{ h.date_action|date:"d/m/Y" }}</td>
+                        <td class="text-muted small">{{ h.note|default:"—" }}</td>
+                        {% if is_admin %}
+                        <td class="text-muted small">{{ h.enregistre_par.username|default:"—" }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <h4 class="text-muted mt-3">Aucun historique trouvé</h4>
+    <p class="text-muted">Aucun mouvement pour les critères sélectionnés.</p>
+</div>
+{% endif %}
+{% endblock %}

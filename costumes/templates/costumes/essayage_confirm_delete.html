@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:auto;">
+  <div class="card-body text-center p-5">
+    <h4 class="text-danger mb-3">Supprimer l'essayage</h4>
+    <p>Supprimer l'essayage de <strong>{{ essayage.acteur.nom_complet }}</strong><br>
+    pour <strong>{{ essayage.representation.titre }}</strong> le {{ essayage.date_essayage|date:"d/m/Y" }} ?</p>
+    <form method="post" class="d-flex gap-2 justify-content-center mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Supprimer</button>
+      <a href="{% url 'essayage_liste' %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

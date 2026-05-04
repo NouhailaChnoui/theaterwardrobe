@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Inventaire — TheaterWardrobe{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1 class="mb-1"> Inventaire des Costumes</h1>
+      <p class="mb-0 opacity-75">Gérez et consultez tout le stock de costumes</p>
+    </div>
+    {% if is_admin %}
+    <a href="{% url 'costume_ajouter' %}" class="btn btn-light btn-lg">Ajouter un costume</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="fs-1 fw-bold text-dark">{{ total }}</div>
+      <div class="text-muted small">Total costumes</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="fs-1 fw-bold text-success">{{ disponibles }}</div>
+      <div class="text-muted small">Disponibles</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="fs-1 fw-bold text-danger">{{ empruntes }}</div>
+      <div class="text-muted small">Empruntés</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card stat-card text-center p-3">
+      <div class="fs-1 fw-bold text-warning">{{ a_reparer }}</div>
+      <div class="text-muted small">À réparer</div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-12 col-md-2">{{ form.type_costume.label_tag }} {{ form.type_costume }}</div>
+      <div class="col-6 col-md-2">{{ form.couleur.label_tag }} {{ form.couleur }}</div>
+      <div class="col-6 col-md-1">{{ form.taille.label_tag }} {{ form.taille }}</div>
+      <div class="col-6 col-md-2">{{ form.etat.label_tag }} {{ form.etat }}</div>
+      <div class="col-6 col-md-2">{{ form.date_emprunt_depuis.label_tag }} {{ form.date_emprunt_depuis }}</div>
+      <div class="col-6 col-md-2">{{ form.date_emprunt_jusqu_au.label_tag }} {{ form.date_emprunt_jusqu_au }}</div>
+      <div class="col-12 col-md-1 d-flex gap-1">
+        <button type="submit" class="btn btn-sm w-100" style="background:#6d0d23;color:white">Filtrer</button>
+        <a href="{% url 'inventaire' %}" class="btn btn-sm btn-outline-secondary w-100">✕</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if costumes %}
+<div class="row g-3">
+  {% for costume in costumes %}
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card costume-card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h6 class="card-title mb-0 fw-bold">{{ costume.type_costume }}</h6>
+          <span class="badge bg-{{ costume.etat_badge_class }}">
+            {% if costume.est_emprunte %}Emprunté{% else %}{{ costume.get_etat_display }}{% endif %}
+          </span>
+        </div>
+        <div class="mb-2 d-flex align-items-center gap-2 flex-wrap">
+          <span class="color-dot" style="background-color: {{ costume.couleur_hex }};"></span>
+          <span class="text-muted small">{{ costume.get_couleur_display }}</span>
+          <span class="badge bg-light text-dark border">{{ costume.get_taille_display }}</span>
+          {% if costume.type_costume.epoque %}
+          <span class="text-muted small fst-italic">{{ costume.type_costume.epoque }}</span>
+          {% endif %}
+        </div>
+        {% if costume.description %}
+        <p class="text-muted small mb-2">{{ costume.description|truncatechars:80 }}</p>
+        {% endif %}
+        {% if costume.est_emprunte %}
+        <div class="alert alert-danger py-1 px-2 mb-2 small">
+          {% if is_admin %}{{ costume.acteur.nom_complet }}{% else %}Emprunté{% endif %}
+          {% if costume.date_emprunt %}<br>depuis le {{ costume.date_emprunt|date:"d/m/Y" }}{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
+        {% if is_admin %}
+        <a href="{% url 'costume_modifier' costume.pk %}" class="btn btn-sm btn-outline-secondary flex-fill">Modifier</a>
+        {% endif %}
+        {% if costume.est_emprunte %}
+          {% if is_admin %}
+          <a href="{% url 'costume_retourner' costume.pk %}" class="btn btn-sm btn-outline-success flex-fill">Retourner</a>
+          {% endif %}
+        {% else %}
+        <a href="{% url 'costume_emprunter' costume.pk %}" class="btn btn-sm flex-fill" style="background:#6d0d23;color:white">Emprunter</a>
+        {% endif %}
+        {% if is_admin %}
+        <a href="{% url 'costume_supprimer' costume.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <h4 class="text-muted mt-3">Aucun costume trouvé</h4>
+  <p class="text-muted">Modifiez les filtres ou ajoutez de nouveaux costumes.</p>
+  {% if is_admin %}
+  <a href="{% url 'costume_ajouter' %}" class="btn btn-lg mt-2" style="background:#6d0d23;color:white">Ajouter un costume</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:auto;">
+  <div class="card-body text-center p-5">
+    <h4 class="text-danger mb-3">Supprimer la représentation</h4>
+    <p>Voulez-vous supprimer <strong>{{ rep.titre }}</strong> ?<br>
+    <small class="text-muted">Tous les essayages associés seront aussi supprimés.</small></p>
+    <form method="post" class="d-flex gap-2 justify-content-center mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Supprimer</button>
+      <a href="{% url 'representation_liste' %}" class="btn btn-outline-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

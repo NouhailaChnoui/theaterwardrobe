@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer — TheaterWardrobe{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"> Confirmer la suppression</h5>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="fs-5">Voulez-vous vraiment supprimer le costume :</p>
+                <p class="fw-bold fs-4 text-danger">{{ costume }}</p>
+                <p class="text-muted">Cette action est irréversible. Tout l'historique lié à ce costume sera également supprimé.</p>
+                <form method="post" class="d-flex gap-3 justify-content-center mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg px-5">
+                         Supprimer
+                    </button>
+                    <a href="{% url 'inventaire' %}" class="btn btn-outline-secondary btn-lg px-5">
+                        Annuler
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

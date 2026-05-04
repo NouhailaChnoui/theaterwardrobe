@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+    <div class="card border-danger"><div class="card-body text-center p-4">
+        <p class="fs-5">Supprimer le type <strong class="text-danger">{{ type_obj }}</strong> ?</p>
+        <form method="post" class="d-flex gap-3 justify-content-center mt-3">{% csrf_token %}
+            <button type="submit" class="btn btn-danger px-5">Supprimer</button>
+            <a href="{% url 'type_liste' %}" class="btn btn-outline-secondary px-5">Annuler</a>
+        </form>
+    </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Représentations — TheaterWardrobe{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1 class="mb-1">Représentations</h1>
+      <p class="mb-0 opacity-75">Gérez les pièces et spectacles</p>
+    </div>
+    {% if is_admin %}
+    <a href="{% url 'representation_ajouter' %}" class="btn btn-light btn-lg">Nouvelle représentation</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if representations %}
+<div class="row g-3">
+  {% for rep in representations %}
+  <div class="col-12 col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="card-title mb-0 fw-bold">{{ rep.titre }}</h5>
+          <span class="badge bg-{{ rep.statut_badge_class }}">{{ rep.get_statut_display }}</span>
+        </div>
+        {% if rep.lieu %}<p class="text-muted small mb-1">{{ rep.lieu }}</p>{% endif %}
+        <p class="text-muted small mb-2">
+          {{ rep.date_debut|date:"d/m/Y" }} → {{ rep.date_fin|date:"d/m/Y" }}
+        </p>
+        {% if rep.description %}
+        <p class="text-muted small mb-2">{{ rep.description|truncatechars:100 }}</p>
+        {% endif %}
+        <div class="d-flex gap-2 mt-2">
+          <span class="badge bg-light text-dark border">{{ rep.nb_essayages }} essayage(s)</span>
+          <span class="badge bg-success text-white">{{ rep.nb_essayages_confirmes }} confirmé(s)</span>
+        </div>
+      </div>
+      <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
+        <a href="{% url 'representation_detail' rep.pk %}" class="btn btn-sm btn-outline-primary flex-fill">Détail</a>
+        <a href="{% url 'essayage_ajouter' %}?representation={{ rep.pk }}" class="btn btn-sm btn-outline-secondary flex-fill">Essayage</a>
+        {% if is_admin %}
+        <a href="{% url 'representation_modifier' rep.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+        <a href="{% url 'representation_supprimer' rep.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+  <h4 class="text-muted">Aucune représentation</h4>
+  {% if is_admin %}
+  <a href="{% url 'representation_ajouter' %}" class="btn btn-lg mt-3" style="background:#6d0d23;color:white">Créer une représentation</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

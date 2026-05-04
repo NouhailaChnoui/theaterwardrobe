@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Essayages — TheaterWardrobe{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1 class="mb-1">Essayages</h1>
+      <p class="mb-0 opacity-75">Planning des essayages par représentation</p>
+    </div>
+    {% if is_admin %}
+    <a href="{% url 'essayage_ajouter' %}" class="btn btn-light btn-lg">Planifier</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="get" class="row g-2 align-items-end">
+      {% if is_admin %}
+      <div class="col-12 col-md-3">{{ form.representation.label_tag }} {{ form.representation }}</div>
+      <div class="col-6 col-md-2">{{ form.acteur.label_tag }} {{ form.acteur }}</div>
+      {% endif %}
+      <div class="col-6 col-md-2">{{ form.statut.label_tag }} {{ form.statut }}</div>
+      <div class="col-6 col-md-2">{{ form.date_debut.label_tag }} {{ form.date_debut }}</div>
+      <div class="col-6 col-md-2">{{ form.date_fin.label_tag }} {{ form.date_fin }}</div>
+      <div class="col-12 col-md-1 d-flex gap-1">
+        <button type="submit" class="btn btn-sm w-100" style="background:#6d0d23;color:white">Filtrer</button>
+        <a href="{% url 'essayage_liste' %}" class="btn btn-sm btn-outline-secondary w-100">✕</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if essayages %}
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="px-4 py-3">Représentation</th>
+            <th>Acteur</th>
+            <th>Costume</th>
+            <th>Date</th>
+            <th>Heure</th>
+            <th>Statut</th>
+            <th>Notes</th>
+            {% if is_admin %}<th>Actions</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in essayages %}
+          <tr>
+            <td class="px-4 fw-semibold">
+              <a href="{% url 'representation_detail' e.representation.pk %}" class="text-decoration-none">
+                {{ e.representation.titre }}
+              </a>
+            </td>
+            <td>{{ e.acteur.nom_complet }}</td>
+            <td>{% if e.costume %}{{ e.costume }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td>{{ e.date_essayage|date:"d/m/Y" }}</td>
+            <td>{% if e.heure %}{{ e.heure|time:"H:i" }}{% else %}—{% endif %}</td>
+            <td>
+              <span class="badge bg-{{ e.statut_badge_class }}">{{ e.get_statut_display }}</span>
+            </td>
+            <td class="text-muted small">{{ e.notes|default:"—"|truncatechars:30 }}</td>
+            {% if is_admin %}
+            <td>
+              <div class="d-flex gap-1">
+                {% if e.statut == 'planifie' %}
+                <form method="post" action="{% url 'essayage_changer_statut' e.pk %}" style="display:inline">
+                  {% csrf_token %}<input type="hidden" name="statut" value="confirme">
+                  <button type="submit" class="btn btn-sm btn-outline-success" title="Confirmer">✓</button>
+                </form>
+                {% endif %}
+                <a href="{% url 'essayage_modifier' e.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                <a href="{% url 'essayage_supprimer' e.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+  <h4 class="text-muted">Aucun essayage trouvé</h4>
+  {% if is_admin %}
+  <a href="{% url 'essayage_ajouter' %}" class="btn btn-lg mt-3" style="background:#6d0d23;color:white">Planifier un essayage</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
