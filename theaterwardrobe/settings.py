@@ -53,8 +53,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'theaterwardrobe',
-        'USER': 'root',          # ton utilisateur MySQL
-        'PASSWORD': '',          # ton mot de passe (vide sur XAMPP/WAMP)
+        'USER': 'root',          
+        'PASSWORD': '',          
         'HOST': 'localhost',
         'PORT': '3306',
     }
